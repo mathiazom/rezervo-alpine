@@ -10,14 +10,6 @@
     <nav class="topbar">
       <div class="topbar-left">
         <a href="/" class="logo"><img src="/logo.svg" alt="rezervo" class="nav-logo" /></a>
-        <!-- biome-ignore lint/a11y/useAnchorContent: aria-label is set dynamically via Alpine :aria-label binding -->
-        <a x-show="preferredChain" href="/chains" :aria-label="preferredChainName || preferredChain" class="chain-badge" style="display:none">
-          <picture x-show="preferredChainLogoDark" x-cloak style="display:none">
-            <source media="(prefers-color-scheme: light)" :srcset="preferredChainLogoLight" />
-            <img :src="preferredChainLogoDark" :alt="preferredChainName" alt="" class="chain-badge-logo" />
-          </picture>
-          <span x-show="!preferredChainLogoDark" x-cloak x-text="preferredChain"></span>
-        </a>
       </div>
       <div class="nav-links">
         <a href="/sessions" class="nav-link active">Mine timer</a>
