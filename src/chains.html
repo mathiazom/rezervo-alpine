@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="nb">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rezervo – Timeplan</title>
+    <link rel="stylesheet" href="./styles/main.css" />
+  </head>
+  <body x-data="chainsPage">
+    <nav class="topbar">
+      <a href="/" class="logo"><img src="/logo.svg" alt="rezervo" class="nav-logo" /></a>
+      <div class="nav-links">
+        <a href="/sessions" class="nav-link">Mine timer</a>
+        <a href="/chains" class="nav-link">Timeplan</a>
+        <button type="button" @click="logout()" class="btn btn-ghost btn-sm">Logg ut</button>
+      </div>
+    </nav>
+
+    <main class="container">
+      <div x-show="loading" class="spinner-wrap">
+        <span class="spinner"></span>
+      </div>
+
+      <p x-show="error && !loading" x-text="error" x-cloak class="error-msg"></p>
+
+      <ul x-show="!loading" x-cloak class="chain-list">
+        <template x-for="chain in chains" :key="chain.profile.identifier">
+          <li>
+            <!-- biome-ignore lint/a11y/useAnchorContent: aria-label is set dynamically via Alpine :aria-label binding -->
+            <a :href="scheduleUrl(chain.profile.identifier)" :aria-label="chain.profile.name" class="chain-card">
+              <img
+                :src="config.apiUrl + '/' + chain.profile.images.dark.largeLogo"
+                :alt="chain.profile.name"
+                alt=""
+                class="chain-logo"
+              />
+            </a>
+          </li>
+        </template>
+      </ul>
+    </main>
+
+    <script type="module" src="./ts/components/chainsPage.ts"></script>
+  </body>
+</html>

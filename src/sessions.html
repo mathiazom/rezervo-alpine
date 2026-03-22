@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="nb">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rezervo – Mine timer</title>
+    <link rel="stylesheet" href="./styles/main.css" />
+  </head>
+  <body x-data="sessionsPage">
+    <nav class="topbar">
+      <div class="topbar-left">
+        <a href="/" class="logo"><img src="/logo.svg" alt="rezervo" class="nav-logo" /></a>
+        <!-- biome-ignore lint/a11y/useAnchorContent: aria-label is set dynamically via Alpine :aria-label binding -->
+        <a x-show="preferredChain" href="/chains" :aria-label="preferredChainName || preferredChain" class="chain-badge" style="display:none">
+          <img x-show="preferredChainLogo" :src="preferredChainLogo" :alt="preferredChainName" alt="" class="chain-badge-logo" />
+          <span x-show="!preferredChainLogo" x-text="preferredChain"></span>
+        </a>
+      </div>
+      <div class="nav-links">
+        <a href="/sessions" class="nav-link active">Mine timer</a>
+        <a :href="scheduleUrl" class="nav-link">Timeplan</a>
+        <button type="button" @click="logout()" class="btn btn-ghost btn-sm">Logg ut</button>
+      </div>
+    </nav>
+
+    <main class="container">
+      <div x-show="loading" class="spinner-wrap">
+        <span class="spinner"></span>
+      </div>
+
+      <p x-show="error && !loading" x-text="error" x-cloak class="error-msg"></p>
+
+      <div x-show="!loading && !error" x-cloak>
+        <template x-if="sessions.length === 0">
+          <p class="empty-state">Ingen kommende bookinger.</p>
+        </template>
+
+        <template x-for="group in sessionsByDate" :key="group.dateKey">
+          <section class="session-group">
+            <h2 class="date-heading" x-text="group.label"></h2>
+            <ul class="session-list">
+              <template x-for="session in group.sessions" :key="session.classData.id">
+                <li class="session-card">
+                  <div class="session-info">
+                    <span class="session-name" x-text="session.classData.activity.name"></span>
+                    <span class="session-time" x-text="formatTime(session.classData.startTime) + ' – ' + formatTime(session.classData.endTime)"></span>
+                    <span class="session-location" x-text="session.classData.location.studio"></span>
+                    <span
+                      class="session-status"
+                      :class="'status-' + session.status"
+                      x-text="statusLabel(session.status)"
+                    ></span>
+                  </div>
+                  <button
+                    type="button"
+                    @click="cancelSession(session)"
+                    :disabled="cancellingId !== ''"
+                    class="btn btn-danger btn-sm"
+                  >
+                    <span x-show="cancellingId === session.classData.id" class="spinner spinner-sm"></span>
+                    <span x-show="cancellingId !== session.classData.id">Avbestill</span>
+                  </button>
+                </li>
+              </template>
+            </ul>
+          </section>
+        </template>
+      </div>
+    </main>
+
+    <script type="module" src="./ts/components/sessionsPage.ts"></script>
+  </body>
+</html>

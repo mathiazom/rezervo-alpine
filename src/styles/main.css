@@ -1,0 +1,640 @@
+/* ── Design tokens ───────────────────────────────────────────────────────── */
+
+:root {
+	/* Spacing scale */
+	--sp-1: 0.25rem;
+	--sp-2: 0.5rem;
+	--sp-3: 0.75rem;
+	--sp-4: 1rem;
+	--sp-5: 1.25rem;
+	--sp-6: 1.5rem;
+	--sp-8: 2rem;
+
+	/* Radius */
+	--radius: 0.5rem;
+	--radius-sm: 0.25rem;
+
+	/* Typography */
+	--font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	--font-xs: 0.72rem;
+	--font-sm: 0.825rem;
+	--font-base: 0.9rem;
+	--font-md: 0.95rem;
+
+	/* Transitions */
+	--t: 0.15s;
+
+	/* Sizing */
+	--topbar-height: 3rem;
+	--nav-logo-h: 1.75rem;
+
+	/* Dark palette (default) */
+	--bg: #0f0f11;
+	--surface: #1a1a1f;
+	--border: #2a2a32;
+	--text: #e8e8ec;
+	--text-muted: #888898;
+	--accent: #4caf50;
+	--accent-hover: #357a38;
+	--danger: #e05c5c;
+	--danger-hover: #f07070;
+	--success: #4caf8a;
+	--waitlist: #e0a045;
+}
+
+@media (prefers-color-scheme: light) {
+	:root {
+		--bg: #f4f4f6;
+		--surface: #ffffff;
+		--border: #d0d0da;
+		--text: #1a1a1f;
+		--text-muted: #60606e;
+		--accent: #2e7d32;
+		--accent-hover: #1b5e20;
+		--danger: #c62828;
+		--danger-hover: #e53935;
+		--success: #1e6e46;
+		--waitlist: #a06000;
+	}
+}
+
+/* ── Reset & base ─────────────────────────────────────────────────────────── */
+
+[x-cloak] {
+	display: none;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+html,
+body {
+	height: 100%;
+	background: var(--bg);
+	color: var(--text);
+	font-family: var(--font);
+	font-size: 15px;
+	line-height: 1.5;
+}
+
+body:has(.topbar) {
+	padding-top: var(--topbar-height);
+}
+
+a {
+	color: var(--accent);
+	text-decoration: none;
+}
+
+/* ── Layout ──────────────────────────────────────────────────────────────── */
+
+.page-center {
+	min-height: 100vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: var(--sp-4);
+}
+
+.container {
+	max-width: 50rem;
+	margin: 0 auto;
+	padding: var(--sp-4);
+}
+
+/* ── Cards ───────────────────────────────────────────────────────────────── */
+
+.card {
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	padding: var(--sp-8);
+	min-width: 20rem;
+	max-width: 25rem;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	gap: var(--sp-6);
+	align-items: center;
+}
+
+/* ── Logo ────────────────────────────────────────────────────────────────── */
+
+.logo {
+	display: flex;
+	align-items: center;
+}
+
+.nav-logo {
+	height: var(--nav-logo-h);
+	width: auto;
+}
+
+/* ── Nav ─────────────────────────────────────────────────────────────────── */
+
+.topbar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	height: var(--topbar-height);
+	padding: 0 var(--sp-4);
+	background: var(--surface);
+	border-bottom: 1px solid var(--border);
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 10;
+}
+
+.topbar-left {
+	display: flex;
+	align-items: center;
+	gap: var(--sp-2);
+}
+
+.nav-links {
+	display: flex;
+	align-items: center;
+	gap: var(--sp-4);
+}
+
+.nav-link {
+	color: var(--text-muted);
+	font-size: var(--font-base);
+	transition: color var(--t);
+}
+
+.nav-link.active {
+	color: var(--text);
+}
+
+.chain-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--sp-2);
+	font-size: var(--font-sm);
+	font-weight: 600;
+	color: var(--text-muted);
+	background: var(--bg);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-sm);
+	padding: var(--sp-1) var(--sp-2);
+	transition:
+		color var(--t),
+		border-color var(--t);
+}
+
+.chain-badge:hover {
+	color: var(--text);
+	border-color: var(--text-muted);
+}
+
+.chain-badge-logo {
+	height: var(--nav-logo-h);
+	width: auto;
+	max-width: 5rem;
+	object-fit: contain;
+	flex-shrink: 0;
+}
+
+@media (max-width: 30rem) {
+	.chain-badge-logo {
+		max-width: 3rem;
+	}
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
+
+.btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--sp-2);
+	padding: var(--sp-2) var(--sp-4);
+	border-radius: var(--radius-sm);
+	border: none;
+	cursor: pointer;
+	font-size: var(--font-base);
+	font-family: var(--font);
+	transition:
+		background var(--t),
+		opacity var(--t),
+		color var(--t),
+		border-color var(--t);
+}
+
+.btn:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+.btn-primary {
+	background: var(--accent);
+	color: #fff;
+	font-weight: 600;
+}
+
+.btn-primary:hover:not(:disabled) {
+	background: var(--accent-hover);
+}
+
+.btn-danger {
+	background: transparent;
+	color: var(--danger);
+	border: 1px solid var(--danger);
+}
+
+.btn-danger:hover:not(:disabled) {
+	background: var(--danger);
+	color: #fff;
+}
+
+.btn-ghost {
+	background: transparent;
+	color: var(--text-muted);
+	border: 1px solid var(--border);
+}
+
+.btn-ghost:hover:not(:disabled) {
+	color: var(--text);
+	border-color: var(--text-muted);
+}
+
+.btn-sm {
+	padding: var(--sp-1) var(--sp-3);
+	font-size: var(--font-sm);
+}
+
+.btn-full {
+	width: 100%;
+}
+
+/* ── Spinner ─────────────────────────────────────────────────────────────── */
+
+@keyframes spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+.spinner {
+	display: inline-block;
+	width: 1.5rem;
+	height: 1.5rem;
+	border: 2px solid var(--border);
+	border-top-color: var(--accent);
+	border-radius: 50%;
+	animation: spin 0.7s linear infinite;
+}
+
+.spinner-sm {
+	width: 0.875rem;
+	height: 0.875rem;
+}
+
+.spinner-wrap {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: var(--sp-3);
+	padding: var(--sp-8) 0;
+}
+
+/* ── Error / notices ─────────────────────────────────────────────────────── */
+
+.error-msg {
+	color: var(--danger);
+	font-size: var(--font-base);
+	text-align: center;
+}
+
+.empty-state {
+	color: var(--text-muted);
+	text-align: center;
+	padding: var(--sp-8) 0;
+}
+
+.muted {
+	color: var(--text-muted);
+	font-size: var(--font-base);
+}
+
+.notice {
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-sm);
+	padding: var(--sp-3) var(--sp-4);
+	font-size: var(--font-sm);
+	color: var(--text-muted);
+	margin-bottom: var(--sp-4);
+}
+
+/* ── Sessions page ───────────────────────────────────────────────────────── */
+
+.session-group {
+	margin-bottom: var(--sp-6);
+}
+
+.date-heading {
+	font-size: var(--font-sm);
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: var(--text-muted);
+	margin-bottom: var(--sp-2);
+	display: flex;
+	align-items: baseline;
+	gap: var(--sp-2);
+}
+
+.date-sub {
+	font-size: var(--font-xs);
+	font-weight: 400;
+	color: var(--text-muted);
+}
+
+.session-list {
+	list-style: none;
+	display: flex;
+	flex-direction: column;
+	gap: var(--sp-2);
+}
+
+.session-card {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--sp-4);
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	padding: var(--sp-3) var(--sp-4);
+}
+
+.session-info {
+	display: flex;
+	flex-direction: column;
+	gap: 0.15rem;
+	min-width: 0;
+}
+
+.session-name {
+	font-weight: 600;
+	font-size: var(--font-md);
+}
+
+.session-time,
+.session-location {
+	font-size: var(--font-sm);
+	color: var(--text-muted);
+}
+
+.session-status {
+	font-size: var(--font-xs);
+	font-weight: 600;
+	margin-top: 0.15rem;
+}
+
+.status-BOOKED,
+.status-CONFIRMED {
+	color: var(--success);
+}
+.status-WAITLIST {
+	color: var(--waitlist);
+}
+.status-PLANNED {
+	color: var(--text-muted);
+}
+
+/* ── Location select ─────────────────────────────────────────────────────── */
+
+.location-select-wrap {
+	margin-bottom: var(--sp-3);
+}
+
+.location-select {
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-sm);
+	color: var(--text);
+	font-family: var(--font);
+	font-size: var(--font-base);
+	padding: var(--sp-2) var(--sp-6) var(--sp-2) var(--sp-3);
+	cursor: pointer;
+	width: 100%;
+	transition: border-color var(--t);
+}
+
+.location-select:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+/* ── Week navigation ─────────────────────────────────────────────────────── */
+
+.week-nav {
+	display: flex;
+	align-items: center;
+	gap: var(--sp-4);
+	margin-bottom: var(--sp-4);
+}
+
+.week-label {
+	font-size: var(--font-md);
+	font-weight: 600;
+	flex: 1;
+	text-align: center;
+}
+
+/* ── Save bar ────────────────────────────────────────────────────────────── */
+
+.save-bar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	background: var(--surface);
+	border-top: 2px solid var(--accent);
+	border-bottom: 1px solid var(--border);
+	padding: var(--sp-2) var(--sp-4);
+	margin: 0 calc(-1 * var(--sp-4)) var(--sp-4);
+	font-size: var(--font-sm);
+	position: sticky;
+	top: var(--topbar-height);
+	z-index: 9;
+	box-shadow: 0 6px 20px color-mix(in srgb, #000 35%, transparent);
+}
+
+.hotkey {
+	display: inline-block;
+	font-family: var(--font);
+	font-size: var(--font-xs);
+	font-weight: 700;
+	line-height: 1;
+	padding: 0.1em 0.35em;
+	border: 1px solid color-mix(in srgb, currentColor 40%, transparent);
+	border-radius: var(--radius-sm);
+	opacity: 0.7;
+	background: transparent;
+	vertical-align: middle;
+}
+
+.hotkey-primary {
+	color: #fff;
+}
+
+.mobile .hotkey {
+	display: none;
+}
+
+.save-actions {
+	display: flex;
+	gap: var(--sp-2);
+}
+
+/* ── Schedule ────────────────────────────────────────────────────────────── */
+
+.schedule-day {
+	margin-bottom: var(--sp-6);
+}
+
+.class-list {
+	list-style: none;
+	display: flex;
+	flex-direction: column;
+	gap: var(--sp-1);
+}
+
+.class-card {
+	display: flex;
+	align-items: stretch;
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	overflow: hidden;
+	cursor: pointer;
+	transition:
+		border-color var(--t),
+		opacity var(--t);
+}
+
+.class-card:hover {
+	border-color: var(--text-muted);
+}
+
+.class-card.class-selected {
+	border-color: var(--accent);
+	background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+}
+
+.class-card.class-past {
+	opacity: 0.5;
+}
+
+.class-card.class-cancelled {
+	opacity: 0.4;
+	cursor: default;
+}
+
+.class-card.class-not-bookable {
+	cursor: default;
+}
+
+.class-color-bar {
+	width: 0.25rem;
+	flex-shrink: 0;
+}
+
+.class-info {
+	flex: 1;
+	padding: var(--sp-2) var(--sp-3);
+	display: flex;
+	flex-direction: column;
+	gap: 0.1rem;
+	min-width: 0;
+}
+
+.class-name {
+	font-weight: 600;
+	font-size: var(--font-base);
+}
+
+.class-time,
+.class-location,
+.class-instructor {
+	font-size: var(--font-xs);
+	color: var(--text-muted);
+}
+
+.class-meta {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	justify-content: center;
+	padding: var(--sp-2) var(--sp-3);
+	gap: var(--sp-1);
+	font-size: var(--font-xs);
+	color: var(--text-muted);
+}
+
+/* ── Chains page ─────────────────────────────────────────────────────────── */
+
+.chain-list {
+	list-style: none;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: var(--sp-4);
+	padding-top: var(--sp-4);
+}
+
+.chain-list > li {
+	width: 11rem;
+}
+
+.chain-card {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 6rem;
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	padding: var(--sp-6);
+	transition: border-color var(--t);
+}
+
+.chain-card:hover {
+	border-color: var(--text-muted);
+}
+
+.chain-logo {
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+}
+
+/* ── Badges ──────────────────────────────────────────────────────────────── */
+
+.badge {
+	display: inline-block;
+	padding: var(--sp-1) var(--sp-2);
+	border-radius: var(--radius-sm);
+	font-size: var(--font-xs);
+	font-weight: 700;
+}
+
+.badge-cancelled {
+	background: var(--danger);
+	color: #fff;
+}
+
+.badge-selected {
+	background: var(--accent);
+	color: #fff;
+}

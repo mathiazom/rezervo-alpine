@@ -1,0 +1,6 @@
+{
+  "fusionAuthUrl": "https://auth.example.com",
+  "fusionAuthClientId": "your-client-id-here",
+  "appUrl": "http://localhost:5173",
+  "apiUrl": "https://api.example.com"
+}

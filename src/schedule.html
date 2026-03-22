@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="nb">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rezervo – Timeplan</title>
+    <link rel="stylesheet" href="/styles/main.css" />
+    <script>if(/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent))document.documentElement.classList.add('mobile')</script>
+  </head>
+  <body x-data="schedulePage">
+    <nav class="topbar">
+      <div class="topbar-left">
+        <a href="/" class="logo"><img src="/logo.svg" alt="rezervo" class="nav-logo" /></a>
+        <!-- biome-ignore lint/a11y/useAnchorContent: aria-label is set dynamically via Alpine :aria-label binding -->
+        <a x-show="chainData" href="/chains" :aria-label="chainData?.profile.name" class="chain-badge" style="display:none">
+          <img x-show="chainLogoUrl" :src="chainLogoUrl" :alt="chainData?.profile.name" alt="" class="chain-badge-logo" />
+          <span x-show="!chainLogoUrl" x-text="chainData?.profile.name"></span>
+        </a>
+      </div>
+      <div class="nav-links">
+        <a href="/sessions" class="nav-link">Mine timer</a>
+        <a :href="'/schedule/' + chain + (selectedLocationId ? '?location=' + selectedLocationId : '')" class="nav-link active">Timeplan</a>
+        <button type="button" @click="logout()" class="btn btn-ghost btn-sm">Logg ut</button>
+      </div>
+    </nav>
+
+    <main class="container">
+      <p x-show="error && !loading" x-text="error" x-cloak class="error-msg"></p>
+
+      <div x-show="!error || days.length > 0">
+        <!-- Location selector -->
+        <div x-show="selectedLocationId" class="location-select-wrap">
+          <select x-model="selectedLocationId" @change="loadSchedule()" class="location-select" :disabled="!chainData || loading">
+            <template x-if="!chainData">
+              <option value=""></option>
+            </template>
+            <template x-for="branch in chainData?.branches ?? []" :key="branch.identifier">
+              <optgroup :label="branch.name">
+                <template x-for="loc in branch.locations" :key="loc.identifier">
+                  <option :value="loc.identifier" :selected="loc.identifier === selectedLocationId" x-text="loc.name"></option>
+                </template>
+              </optgroup>
+            </template>
+          </select>
+        </div>
+
+        <!-- Week navigation -->
+        <div class="week-nav">
+          <button type="button" @click="navigateWeek(-1)" class="btn btn-ghost btn-sm" :disabled="loading">&larr;</button>
+          <span class="week-label" x-text="weekLabel"></span>
+          <button type="button" @click="navigateWeek(1)" class="btn btn-ghost btn-sm" :disabled="loading">&rarr;</button>
+        </div>
+
+        <!-- Loading spinner -->
+        <div x-show="loading" class="spinner-wrap">
+          <span class="spinner"></span>
+        </div>
+
+        <!-- Config save bar -->
+        <div x-show="!loading && configDirty" x-cloak class="save-bar">
+          <span>Ulagrede endringer</span>
+          <div class="save-actions">
+            <button type="button" @click="discardConfig()" class="btn btn-ghost btn-sm" :disabled="savingConfig">
+              Forkast <kbd class="hotkey">Esc</kbd>
+            </button>
+            <button type="button" @click="saveConfig()" class="btn btn-primary btn-sm" :disabled="savingConfig">
+              <span x-show="savingConfig" class="spinner spinner-sm"></span>
+              <span x-show="!savingConfig">Lagre <kbd class="hotkey hotkey-primary">S</kbd></span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Config unavailable notice -->
+        <div x-show="!loading && config_unavailable && !configDirty" x-cloak class="notice">
+          Du er ikke registrert for denne kjeden. Velg timer og lagre for å sette opp auto-booking.
+        </div>
+
+        <!-- Schedule days -->
+        <template x-for="day in days" :key="day.date">
+          <section class="schedule-day">
+            <h2 class="date-heading">
+              <span x-text="day.dayName"></span>
+              <span class="date-sub" x-text="day.date"></span>
+            </h2>
+            <ul class="class-list">
+              <template x-for="cls in day.classes" :key="cls.id">
+                <li
+                  class="class-card"
+                  :class="{
+                    'class-cancelled': cls.isCancelled,
+                    'class-past': isInPast(cls.startTime),
+                    'class-selected': isClassInConfig(cls),
+                    'class-not-bookable': !cls.isBookable && !cls.isCancelled,
+                  }"
+                  @click="!cls.isCancelled && cls.isBookable && toggleClass(cls)"
+                >
+                  <div class="class-color-bar" :style="'background:' + cls.activity.color"></div>
+                  <div class="class-info">
+                    <div class="class-name" x-text="cls.activity.name"></div>
+                    <div class="class-time">
+                      <span x-text="formatTime(cls.startTime)"></span>
+                      &ndash;
+                      <span x-text="formatTime(cls.endTime)"></span>
+                    </div>
+                    <div class="class-location" x-text="cls.location.studio + (cls.location.room ? ' · ' + cls.location.room : '')"></div>
+                    <div class="class-instructor" x-text="cls.instructors.map(i => i.name).join(', ')"></div>
+                  </div>
+                  <div class="class-meta">
+                    <span x-show="cls.isCancelled" class="badge badge-cancelled">Avlyst</span>
+                    <span x-show="!cls.isCancelled && cls.availableSlots !== null && cls.availableSlots !== undefined">
+                      <span x-text="cls.availableSlots"></span> ledig
+                    </span>
+                    <span x-show="isClassInConfig(cls)" class="badge badge-selected">✓</span>
+                  </div>
+                </li>
+              </template>
+            </ul>
+          </section>
+        </template>
+      </div>
+    </main>
+
+    <script type="module" src="/ts/components/schedulePage.ts"></script>
+  </body>
+</html>
