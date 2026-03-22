@@ -4,23 +4,23 @@ import { defineConfig, type Plugin } from "vite";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 
+const routes: Record<string, string> = {
+	"/": "/sessions.html",
+	"/sessions": "/sessions.html",
+	"/chains": "/chains.html",
+	"/login": "/login.html",
+	"/callback": "/callback.html",
+};
+
 function mpaDevRoutes(): Plugin {
 	return {
 		name: "mpa-dev-routes",
 		configureServer(server) {
 			server.middlewares.use((req, _res, next) => {
 				const url = (req.url ?? "/").split("?")[0];
-				if (url === "/sessions") {
-					req.url = "/sessions.html";
-				} else if (url === "/" || url === "/chains") {
-					req.url = "/chains.html";
-				} else if (url === "/login") {
-					req.url = "/login.html";
-				} else if (url === "/callback") {
-					req.url = "/callback.html";
-				} else if (url.startsWith("/schedule/")) {
-					req.url = "/schedule.html";
-				}
+				req.url =
+					routes[url] ??
+					(url.startsWith("/schedule/") ? "/schedule.html" : req.url);
 				next();
 			});
 		},
