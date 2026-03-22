@@ -135,12 +135,6 @@ a {
 	width: auto;
 }
 
-@media (prefers-color-scheme: light) {
-	.nav-logo {
-		filter: invert(1);
-	}
-}
-
 /* ── Nav ─────────────────────────────────────────────────────────────────── */
 
 .topbar {
