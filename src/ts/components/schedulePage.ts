@@ -50,9 +50,9 @@ Alpine.data("schedulePage", () => ({
 			return;
 		}
 
-		this.currentWeek = currentCompactIsoWeek();
 		localStorage.setItem("preferredChain", this.chain);
 		const params = new URLSearchParams(window.location.search);
+		this.currentWeek = params.get("week") ?? currentCompactIsoWeek();
 		this.selectedLocationId =
 			params.get("location") ?? this.getSavedLocation() ?? "";
 
@@ -201,6 +201,12 @@ Alpine.data("schedulePage", () => ({
 			this.saveLocation();
 		} else {
 			params.delete("location");
+		}
+		const currentIsoWeek = currentCompactIsoWeek();
+		if (this.currentWeek && this.currentWeek !== currentIsoWeek) {
+			params.set("week", this.currentWeek);
+		} else {
+			params.delete("week");
 		}
 		const newSearch = params.toString();
 		history.replaceState(
