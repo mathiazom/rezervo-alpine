@@ -1,5 +1,5 @@
 import Alpine from "alpinejs";
-import { getToken, startPkceFlow } from "@/auth";
+import { startPkceFlow, tryRefresh } from "@/auth";
 import { type AppConfig, loadConfig } from "@/config";
 
 Alpine.data("loginPage", () => ({
@@ -10,12 +10,14 @@ Alpine.data("loginPage", () => ({
 	async init() {
 		try {
 			this.config = await loadConfig();
-			if (getToken()) {
-				window.location.href = `${this.config.appUrl}/sessions`;
+			// If a valid session exists (refresh token cookie present), skip login
+			const token = await tryRefresh();
+			if (token) {
+				window.location.href = "/sessions";
 				return;
 			}
-		} catch (e) {
-			this.error = e instanceof Error ? e.message : "Failed to load config";
+		} catch {
+			// ignore — show login button
 		} finally {
 			this.loading = false;
 		}

@@ -37,7 +37,7 @@ Alpine.data("sessionsPage", () => ({
 	async init() {
 		try {
 			this.config = await loadConfig();
-			const token = await requireAuth(this.config);
+			const token = await requireAuth();
 			this.sessions = await fetchUserSessions(this.config.apiUrl, token);
 		} catch (e) {
 			this.error = e instanceof Error ? e.message : "Failed to load sessions";
@@ -85,7 +85,7 @@ Alpine.data("sessionsPage", () => ({
 		if (!this.config || this.cancellingId) return;
 		this.cancellingId = session.classData.id;
 		try {
-			const token = await requireAuth(this.config);
+			const token = await requireAuth();
 			await cancelBooking(
 				this.config.apiUrl,
 				session.chain,
@@ -103,7 +103,7 @@ Alpine.data("sessionsPage", () => ({
 	},
 
 	logout() {
-		if (this.config) logout(this.config);
+		void logout();
 	},
 }));
 

@@ -3,14 +3,6 @@ import type { AppConfig } from "./config";
 // Access token lives in memory only — never written to any storage
 let accessToken: string | null = null;
 
-export function getToken(): string | null {
-	return accessToken;
-}
-
-export function setToken(token: string): void {
-	accessToken = token;
-}
-
 export function clearToken(): void {
 	accessToken = null;
 }
@@ -50,7 +42,7 @@ export async function startPkceFlow(config: AppConfig): Promise<void> {
 		response_type: "code",
 		client_id: config.fusionAuthClientId,
 		redirect_uri: `${config.appUrl}/callback`,
-		scope: "openid",
+		scope: "openid offline_access",
 		state,
 		code_challenge: challenge,
 		code_challenge_method: "S256",
@@ -59,7 +51,9 @@ export async function startPkceFlow(config: AppConfig): Promise<void> {
 	window.location.href = `${config.fusionAuthUrl}/oauth2/authorize?${params}`;
 }
 
-export async function handleCallback(config: AppConfig): Promise<string> {
+// ── Callback: send code to auth proxy, which sets httpOnly refresh token cookie ──
+
+export async function handleCallback(): Promise<string> {
 	const params = new URLSearchParams(window.location.search);
 	const code = params.get("code");
 	const state = params.get("state");
@@ -69,114 +63,54 @@ export async function handleCallback(config: AppConfig): Promise<string> {
 	if (!code || !state) throw new Error("Missing code or state in callback");
 
 	const storedState = sessionStorage.getItem("pkce_state");
-	const verifier = sessionStorage.getItem("pkce_verifier");
+	const codeVerifier = sessionStorage.getItem("pkce_verifier");
 
 	if (state !== storedState) throw new Error("State mismatch");
-	if (!verifier) throw new Error("Missing PKCE verifier");
+	if (!codeVerifier) throw new Error("Missing PKCE verifier");
 
 	sessionStorage.removeItem("pkce_state");
 	sessionStorage.removeItem("pkce_verifier");
 
-	const body = new URLSearchParams({
-		grant_type: "authorization_code",
-		client_id: config.fusionAuthClientId,
-		code,
-		redirect_uri: `${config.appUrl}/callback`,
-		code_verifier: verifier,
-	});
-
-	const res = await fetch(`${config.fusionAuthUrl}/oauth2/token`, {
+	const res = await fetch("/auth/token", {
 		method: "POST",
-		headers: { "Content-Type": "application/x-www-form-urlencoded" },
-		body: body.toString(),
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({ code, codeVerifier }),
 	});
 
-	if (!res.ok) {
-		const body = await res.text().catch(() => "");
-		console.error("Token exchange error:", res.status, body);
-		throw new Error(`Token exchange failed: ${res.status} — ${body}`);
-	}
+	if (!res.ok) throw new Error(`Token exchange failed: ${res.status}`);
 	const json = await res.json();
 	const token: string = json.access_token;
 	if (!token) throw new Error("No access_token in response");
 
-	setToken(token);
+	accessToken = token;
 	return token;
 }
 
-// ── Silent renew via hidden iframe ────────────────────────────────────────────
+// ── Refresh access token via auth proxy (reads httpOnly cookie) ───────────────
 
-async function silentRenew(config: AppConfig): Promise<string> {
-	const verifier = generateRandomBase64url(32);
-	const state = generateRandomBase64url(16);
-	const challenge = await codeChallenge(verifier);
-
-	// Store for the callback page to pick up (same origin)
-	sessionStorage.setItem("pkce_verifier", verifier);
-	sessionStorage.setItem("pkce_state", state);
-
-	const params = new URLSearchParams({
-		response_type: "code",
-		client_id: config.fusionAuthClientId,
-		redirect_uri: `${config.appUrl}/callback`,
-		scope: "openid",
-		state,
-		code_challenge: challenge,
-		code_challenge_method: "S256",
-		prompt: "none",
-	});
-
-	const iframe = document.createElement("iframe");
-	iframe.style.display = "none";
-	iframe.src = `${config.fusionAuthUrl}/oauth2/authorize?${params}`;
-
-	return new Promise((resolve, reject) => {
-		const timeout = setTimeout(() => {
-			cleanup();
-			reject(new Error("Silent renew timed out"));
-		}, 10_000);
-
-		function onMessage(event: MessageEvent) {
-			if (event.origin !== window.location.origin) return;
-			if (event.data?.type === "silent-renew-success") {
-				cleanup();
-				resolve(event.data.token as string);
-			} else if (event.data?.type === "silent-renew-failure") {
-				cleanup();
-				reject(new Error("Silent renew failed: session expired"));
-			}
-		}
-
-		function cleanup() {
-			clearTimeout(timeout);
-			window.removeEventListener("message", onMessage);
-			if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
-		}
-
-		window.addEventListener("message", onMessage);
-		document.body.appendChild(iframe);
-	});
+// Returns the token or null — never redirects. Use on pages that handle the
+// unauthenticated state themselves (e.g. the login page).
+export async function tryRefresh(): Promise<string | null> {
+	if (accessToken) return accessToken;
+	const res = await fetch("/auth/refresh", { method: "POST" });
+	if (!res.ok) return null;
+	const json = await res.json();
+	accessToken = json.access_token as string;
+	return accessToken;
 }
 
-// ── requireAuth ───────────────────────────────────────────────────────────────
-
-export async function requireAuth(config: AppConfig): Promise<string> {
-	if (accessToken) return accessToken;
-
-	try {
-		const token = await silentRenew(config);
-		accessToken = token;
-		return token;
-	} catch {
-		window.location.href = `${config.appUrl}/login`;
-		// Never resolves — we're navigating away
-		return new Promise(() => {});
-	}
+// Returns the token or redirects to /login. Use on protected pages.
+export async function requireAuth(): Promise<string> {
+	const token = await tryRefresh();
+	if (token) return token;
+	window.location.href = "/login";
+	return new Promise(() => {});
 }
 
 // ── Logout ────────────────────────────────────────────────────────────────────
 
-export function logout(config: AppConfig): void {
-	clearToken();
-	window.location.href = `${config.appUrl}/login`;
+export async function logout(): Promise<void> {
+	accessToken = null;
+	await fetch("/auth/logout", { method: "POST" }).catch(() => {});
+	window.location.href = "/login";
 }

@@ -68,7 +68,7 @@ Alpine.data("schedulePage", () => ({
 
 		try {
 			this.config_obj = await loadConfig();
-			this.token = await requireAuth(this.config_obj);
+			this.token = await requireAuth();
 
 			if (this.selectedLocationId) {
 				// Location known — fire all three requests in parallel
@@ -281,7 +281,7 @@ Alpine.data("schedulePage", () => ({
 		if (!this.config_obj || !this.pendingConfig || this.savingConfig) return;
 		this.savingConfig = true;
 		try {
-			const token = await requireAuth(this.config_obj);
+			const token = await requireAuth();
 			const saved = await putChainConfig(
 				this.config_obj.apiUrl,
 				this.chain,
@@ -303,7 +303,7 @@ Alpine.data("schedulePage", () => ({
 	},
 
 	logout() {
-		if (this.config_obj) logout(this.config_obj);
+		void logout();
 	},
 }));
 

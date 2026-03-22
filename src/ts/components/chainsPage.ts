@@ -23,7 +23,7 @@ Alpine.data("chainsPage", () => ({
 	async init() {
 		try {
 			this.config = await loadConfig();
-			await requireAuth(this.config);
+			await requireAuth();
 			this.chains = await fetchChains(this.config.apiUrl);
 		} catch (e) {
 			this.error = e instanceof Error ? e.message : "Failed to load chains";
@@ -33,7 +33,7 @@ Alpine.data("chainsPage", () => ({
 	},
 
 	logout() {
-		if (this.config) logout(this.config);
+		void logout();
 	},
 }));
 

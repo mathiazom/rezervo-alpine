@@ -8,7 +8,8 @@ Alpine.js frontend for [rezervo](https://github.com/mathiazom/rezervo)
 - **Vite** — multi-page build
 - **TypeScript** + **Zod** — typed API responses
 - **Biome** — formatting and linting
-- **OAuth2 PKCE** — auth via FusionAuth (no tokens in storage)
+- **OAuth2 PKCE** — auth via FusionAuth; access token in memory, refresh token in httpOnly cookie
+- **Rust** (`axum` + `tokio` + `reqwest`) — thin auth proxy compiled into the Docker image
 
 ## 📄 Pages
 
@@ -18,15 +19,18 @@ Alpine.js frontend for [rezervo](https://github.com/mathiazom/rezervo)
 | `/schedule/<chain>` | Weekly schedule + auto-booking config |
 | `/sessions` | Upcoming bookings |
 | `/login` | Login entry point |
-| `/callback` | OAuth2 callback (also used for silent renew) |
+| `/callback` | OAuth2 callback |
 
 ## 🚀 Local development
 
 ```sh
 pnpm install
 cp public/config.json.example public/config.json
-# edit public/config.json with real values
-pnpm dev
+cp template.env .env
+# edit public/config.json and .env with real values
+
+pnpm dev        # Vite dev server on :3000 (proxies /auth → :4000)
+pnpm dev:auth   # auth proxy on :4000 (requires Rust / cargo)
 ```
 
 ## ✨ CI scripts
@@ -76,4 +80,4 @@ App is available at `http://localhost:8080`.
 | `APP_URL` | Public URL of this app (used as OAuth2 redirect base) |
 | `API_URL` | rezervo API base URL |
 
-These are injected into `/config.json` at container start by `docker/docker-entrypoint.sh`.
+`FUSIONAUTH_URL`, `FUSIONAUTH_CLIENT_ID`, and `APP_URL` are also read by the auth proxy at startup. All four are injected into `/config.json` at container start by `docker/docker-entrypoint.sh`.

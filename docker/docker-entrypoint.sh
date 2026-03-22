@@ -15,4 +15,7 @@ cat > /usr/share/nginx/html/config.json <<EOF
 }
 EOF
 
+# Start auth proxy in background
+/auth-proxy &
+
 exec "$@"

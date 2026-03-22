@@ -34,6 +34,9 @@ export default defineConfig({
 	server: {
 		port: 3000,
 		allowedHosts: true,
+		proxy: {
+			"/auth": "http://localhost:4000",
+		},
 	},
 	build: {
 		outDir: resolve(__dirname, "dist"),
