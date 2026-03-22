@@ -172,21 +172,26 @@ Alpine.data("schedulePage", () => ({
 
 	persistChainMeta() {
 		if (!this.chainData || !this.config_obj) return;
-		const logo =
-			this.config_obj.apiUrl +
-			"/" +
-			this.chainData.profile.images.dark.largeLogo;
+		const base = `${this.config_obj.apiUrl}/`;
 		localStorage.setItem("preferredChainName", this.chainData.profile.name);
-		localStorage.setItem("preferredChainLogo", logo);
+		localStorage.setItem(
+			"preferredChainLogoDark",
+			base + this.chainData.profile.images.dark.largeLogo,
+		);
+		localStorage.setItem(
+			"preferredChainLogoLight",
+			base + this.chainData.profile.images.light.largeLogo,
+		);
 	},
 
-	get chainLogoUrl(): string {
+	get chainLogoUrlDark(): string {
 		if (!this.chainData || !this.config_obj) return "";
-		return (
-			this.config_obj.apiUrl +
-			"/" +
-			this.chainData.profile.images.dark.largeLogo
-		);
+		return `${this.config_obj.apiUrl}/${this.chainData.profile.images.dark.largeLogo}`;
+	},
+
+	get chainLogoUrlLight(): string {
+		if (!this.chainData || !this.config_obj) return "";
+		return `${this.config_obj.apiUrl}/${this.chainData.profile.images.light.largeLogo}`;
 	},
 
 	syncLocationUrl() {

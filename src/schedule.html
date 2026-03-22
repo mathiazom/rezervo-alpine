@@ -13,8 +13,11 @@
         <a href="/" class="logo"><img src="/logo.svg" alt="rezervo" class="nav-logo" /></a>
         <!-- biome-ignore lint/a11y/useAnchorContent: aria-label is set dynamically via Alpine :aria-label binding -->
         <a x-show="chainData" href="/chains" :aria-label="chainData?.profile.name" class="chain-badge" style="display:none">
-          <img x-show="chainLogoUrl" :src="chainLogoUrl" :alt="chainData?.profile.name" alt="" class="chain-badge-logo" />
-          <span x-show="!chainLogoUrl" x-text="chainData?.profile.name"></span>
+          <picture x-show="chainLogoUrlDark" x-cloak style="display:none">
+            <source media="(prefers-color-scheme: light)" :srcset="chainLogoUrlLight" />
+            <img :src="chainLogoUrlDark" :alt="chainData?.profile.name" alt="" class="chain-badge-logo" />
+          </picture>
+          <span x-show="!chainLogoUrlDark" x-cloak x-text="chainData?.profile.name"></span>
         </a>
       </div>
       <div class="nav-links">
@@ -25,7 +28,7 @@
     </nav>
 
     <main class="container">
-      <p x-show="error && !loading" x-text="error" x-cloak class="error-msg"></p>
+      <p x-show="error && !loading" x-text="error" x-cloak style="display:none" class="error-msg"></p>
 
       <div x-show="!error || days.length > 0">
         <!-- Location selector -->
@@ -57,7 +60,7 @@
         </div>
 
         <!-- Config save bar -->
-        <div x-show="!loading && configDirty" x-cloak class="save-bar">
+        <div x-show="!loading && configDirty" x-cloak style="display:none" class="save-bar">
           <span>Ulagrede endringer</span>
           <div class="save-actions">
             <button type="button" @click="discardConfig()" class="btn btn-ghost btn-sm" :disabled="savingConfig">
@@ -71,7 +74,7 @@
         </div>
 
         <!-- Config unavailable notice -->
-        <div x-show="!loading && config_unavailable && !configDirty" x-cloak class="notice">
+        <div x-show="!loading && config_unavailable && !configDirty" x-cloak style="display:none" class="notice">
           Du er ikke registrert for denne kjeden. Velg timer og lagre for å sette opp auto-booking.
         </div>
 

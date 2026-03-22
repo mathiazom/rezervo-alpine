@@ -19,7 +19,9 @@ Alpine.data("sessionsPage", () => ({
 	config: null as AppConfig | null,
 	preferredChain: localStorage.getItem("preferredChain") ?? "",
 	preferredChainName: localStorage.getItem("preferredChainName") ?? "",
-	preferredChainLogo: localStorage.getItem("preferredChainLogo") ?? "",
+	preferredChainLogoDark: localStorage.getItem("preferredChainLogoDark") ?? "",
+	preferredChainLogoLight:
+		localStorage.getItem("preferredChainLogoLight") ?? "",
 
 	get scheduleUrl(): string {
 		if (!this.preferredChain) return "/chains";

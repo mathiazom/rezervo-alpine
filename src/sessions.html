@@ -12,8 +12,11 @@
         <a href="/" class="logo"><img src="/logo.svg" alt="rezervo" class="nav-logo" /></a>
         <!-- biome-ignore lint/a11y/useAnchorContent: aria-label is set dynamically via Alpine :aria-label binding -->
         <a x-show="preferredChain" href="/chains" :aria-label="preferredChainName || preferredChain" class="chain-badge" style="display:none">
-          <img x-show="preferredChainLogo" :src="preferredChainLogo" :alt="preferredChainName" alt="" class="chain-badge-logo" />
-          <span x-show="!preferredChainLogo" x-text="preferredChain"></span>
+          <picture x-show="preferredChainLogoDark" x-cloak style="display:none">
+            <source media="(prefers-color-scheme: light)" :srcset="preferredChainLogoLight" />
+            <img :src="preferredChainLogoDark" :alt="preferredChainName" alt="" class="chain-badge-logo" />
+          </picture>
+          <span x-show="!preferredChainLogoDark" x-cloak x-text="preferredChain"></span>
         </a>
       </div>
       <div class="nav-links">
@@ -28,9 +31,9 @@
         <span class="spinner"></span>
       </div>
 
-      <p x-show="error && !loading" x-text="error" x-cloak class="error-msg"></p>
+      <p x-show="error && !loading" x-text="error" x-cloak style="display:none" class="error-msg"></p>
 
-      <div x-show="!loading && !error" x-cloak>
+      <div x-show="!loading && !error" x-cloak style="display:none">
         <template x-if="sessions.length === 0">
           <p class="empty-state">Ingen kommende bookinger.</p>
         </template>

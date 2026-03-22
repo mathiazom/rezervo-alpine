@@ -21,19 +21,22 @@
         <span class="spinner"></span>
       </div>
 
-      <p x-show="error && !loading" x-text="error" x-cloak class="error-msg"></p>
+      <p x-show="error && !loading" x-text="error" x-cloak style="display:none" class="error-msg"></p>
 
-      <ul x-show="!loading" x-cloak class="chain-list">
+      <ul x-show="!loading" x-cloak style="display:none" class="chain-list">
         <template x-for="chain in chains" :key="chain.profile.identifier">
           <li>
             <!-- biome-ignore lint/a11y/useAnchorContent: aria-label is set dynamically via Alpine :aria-label binding -->
             <a :href="scheduleUrl(chain.profile.identifier)" :aria-label="chain.profile.name" class="chain-card">
-              <img
-                :src="config.apiUrl + '/' + chain.profile.images.dark.largeLogo"
-                :alt="chain.profile.name"
-                alt=""
-                class="chain-logo"
-              />
+              <picture>
+                <source media="(prefers-color-scheme: light)" :srcset="config.apiUrl + '/' + chain.profile.images.light.largeLogo" />
+                <img
+                  :src="config.apiUrl + '/' + chain.profile.images.dark.largeLogo"
+                  :alt="chain.profile.name"
+                  alt=""
+                  class="chain-logo"
+                />
+              </picture>
             </a>
           </li>
         </template>

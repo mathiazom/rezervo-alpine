@@ -26,7 +26,7 @@
 
 	/* Sizing */
 	--topbar-height: 3rem;
-	--nav-logo-h: 1.75rem;
+	--nav-logo-h: 1.5rem;
 
 	/* Dark palette (default) */
 	--bg: #0f0f11;
@@ -135,6 +135,12 @@ a {
 	width: auto;
 }
 
+@media (prefers-color-scheme: light) {
+	.nav-logo {
+		filter: invert(1);
+	}
+}
+
 /* ── Nav ─────────────────────────────────────────────────────────────────── */
 
 .topbar {
@@ -177,7 +183,6 @@ a {
 .chain-badge {
 	display: inline-flex;
 	align-items: center;
-	gap: var(--sp-2);
 	font-size: var(--font-sm);
 	font-weight: 600;
 	color: var(--text-muted);
@@ -195,8 +200,11 @@ a {
 	border-color: var(--text-muted);
 }
 
+.chain-badge picture {
+	display: contents;
+}
+
 .chain-badge-logo {
-	height: var(--nav-logo-h);
 	width: auto;
 	max-width: 5rem;
 	object-fit: contain;
