@@ -33,7 +33,7 @@ export default defineConfig({
 	plugins: [mpaDevRoutes()],
 	server: {
 		port: 3000,
-		allowedHosts: ["mdev.rezervo.no"],
+		allowedHosts: true,
 	},
 	build: {
 		outDir: resolve(__dirname, "dist"),
